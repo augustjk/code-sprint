@@ -36,6 +36,7 @@ userController.verifyUser = (req, res, next) => {
     `, [username])
     .then(resp => {
       if (resp.rows[0] && bcrypt.compareSync(password, resp.rows[0].password)) {
+        res.locals.ssid = uuidv4();
         res.locals.user = resp.rows[0];
         next();
       } else {

@@ -8,7 +8,8 @@ client.on('connect', ()=>{
 sessionController = {};
 
 sessionController.createSession = (req, res, next) => {
-  client.set(res.locals.ssid, res.locals.user.id, 'EX', 1800);
+  client.hmset(res.locals.ssid, res.locals.user);
+  client.expire(res.locals.ssid, 300);
   return next();
 }
 

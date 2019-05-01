@@ -7,11 +7,13 @@ body {
 }
 
 .correct {
-  color: green;
+  background-color: green;
+  color: white;
 }
 
 .incorrect {
-  color: red;
+  background-color: red;
+  color: white;
 }
 
 .current {
@@ -20,4 +22,8 @@ body {
 
 .input {
   
+}
+
+#title{ 
+  color: lightcoral;
 }

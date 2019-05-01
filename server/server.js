@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
 const path = require('path');
 const bodyparser = require('body-parser');
 const cookieparser = require('cookie-parser');
@@ -9,9 +12,13 @@ const sessionController = require('./controllers/sessionController');
 const userController = require('./controllers/userController');
 const snippetController = require('./controllers/snippetController');
 
+
+
 const PORT = 3000;
 
 app.use(bodyparser.json(), cookieparser(), cors());
+
+app.use('/build', express.static(path.join(__dirname, '../build')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
@@ -33,7 +40,7 @@ app.get('/snippet', snippetController.getSnippet, (req, res) => {
   res.json(res.locals.snippets);
 });
 
-app.get('/login', sessionController.verifySession, (req, res) => {
+app.get('/login', (req, res) => {
   res.json('No session');
 });
 
@@ -50,7 +57,21 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something went wrong');
 })
 
-app.listen(PORT, () => {console.log(`Listening on port ${PORT}...`)});
+io.on('connection', (client) => {
+  console.log('A user has connected')
+  client.send('hi from server via ws');
+  client.on('intro', name=>{
+    io.sockets.send(`${name} joined the server`);
+    io.sockets.clients((err, clients)=>{
+      io.sockets.emit('count', clients.length);
+    });
+  });
+  
+});
+
+server.listen(PORT, () => {console.log(`Listening on port ${PORT}...`)});
+
+// app.listen(PORT, () => {console.log(`Listening on port ${PORT}...`)});
 
 //  (\____/)
 //  (='.'=)
